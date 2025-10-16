@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class WidgetCustomTextField extends StatelessWidget {
   final TextEditingController textController;
-  const WidgetCustomTextField({super.key, required this.textController});
+  final Function(String)? textChangedEvent;
+  const WidgetCustomTextField({super.key, required this.textController, required this.textChangedEvent});
 
   @override
   Widget build(BuildContext context) {
@@ -10,6 +11,7 @@ class WidgetCustomTextField extends StatelessWidget {
       controller: textController,
       textAlign: TextAlign.center,
       textAlignVertical: TextAlignVertical.center,
+      onChanged: textChangedEvent,
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),

@@ -18,11 +18,17 @@ class ModelManga extends ChangeNotifier {
     required this.description,
   });
 
-  factory ModelManga.fromJson(Map<String, dynamic> json) {
+  factory ModelManga.fromJson(Map<String, dynamic> json, bool hasGenre) {
+    String image = "";
+    if(hasGenre){
+      image = json["image"];
+    }else{
+      image = json["imgUrl"];
+    }
     return ModelManga(
       id: json['id'],
       title: json['title'],
-      imgUrl: json['imgUrl'],
+      imgUrl: image,
       latestChapter: json['latestChapter'],
       description: json['description'],
     );
