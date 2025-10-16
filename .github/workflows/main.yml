@@ -20,10 +20,16 @@ jobs:
           java-version: '17'
         
       - name: Set Up Flutter
-        uses: subosito/fluter-action@v2
-        with:
-          flutter-version: '3.32.4'
-          channel: 'stable'
+        run: |
+          # Shallow-clone Flutter to reduce download size
+          git clone --depth 1 --branch 3.27.3 https://github.com/flutter/flutter.git $RUNNER_TEMP/flutter
+
+          # Add Flutter to PATH
+          echo "$RUNNER_TEMP/flutter/bin" >> $GITHUB_PATH
+        #uses: subosito/fluter-action@v2
+        #with:
+        #  flutter-version: '3.32.4'
+        #  channel: 'stable'
 
       - name: Install Dependencies
         run: flutter pub get
