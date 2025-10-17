@@ -20,9 +20,9 @@ class ModelManga extends ChangeNotifier {
 
   factory ModelManga.fromJson(Map<String, dynamic> json, bool hasGenre) {
     String image = "";
-    if(hasGenre){
+    if (hasGenre) {
       image = json["image"];
-    }else{
+    } else {
       image = json["imgUrl"];
     }
     return ModelManga(
@@ -48,9 +48,13 @@ class ModelManga extends ChangeNotifier {
   Uint8List? get image => _image;
 
   setImage() async {
-    var response = await http.get(Uri.parse(imgUrl));
-    var responseBody = response.bodyBytes;
-    _image = responseBody;
-    notifyListeners();
+    try {
+      var response = await http.get(Uri.parse(imgUrl));
+      var responseBody = response.bodyBytes;
+      _image = responseBody;
+      notifyListeners();
+    } catch (_) {
+      setImage();
+    }
   }
 }

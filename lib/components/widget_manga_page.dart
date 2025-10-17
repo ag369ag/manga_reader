@@ -15,7 +15,9 @@ class WidgetMangaPage extends StatelessWidget {
               width: 300,
               child: Center(child: CircularProgressIndicator(color: Colors.black)),
             )
-          : Image.memory(mangaPage.image!),
+          : InteractiveViewer(
+            maxScale: 5,
+            child: Image.memory(mangaPage.image!)),
     );
   }
 }

@@ -25,7 +25,7 @@ class _PageMangaListState extends State<PageMangaList> {
   void initState() {
     super.initState();
     _mangaService.getMangaList(_pageNumber);
-    //_mangaService.getGenres();
+    _mangaService.getGenres();
   }
 
   @override
@@ -49,24 +49,61 @@ class _PageMangaListState extends State<PageMangaList> {
                       child: CircularProgressIndicator(color: Colors.black),
                     ),
                   )
-                : SingleChildScrollView(
-                  child: Wrap(
-                    runAlignment: WrapAlignment.center,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    runSpacing: 5,
-                    spacing: 5,
-                    direction: Axis.horizontal,
-                    children: _mangaService.mangaList
-                        .map(
-                          (manga) => WidgetMangaDisplay(
-                            manga: manga,
-                            mangaService: _mangaService,
-                            screenSize: _screenSize,
+                : Column(
+                    children: [
+                      Visibility(
+                        visible: _mangaService.genreSelected.isNotEmpty,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Genre: ${_mangaService.genreSelected}",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                _mangaService.removeSelectedGenre();
+                                _mangaService.getMangaList(_pageNumber);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 5),
+                                decoration: BoxDecoration(
+                                  color: Colors.black45,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(Icons.close, color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Wrap(
+                            runAlignment: WrapAlignment.center,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            runSpacing: 5,
+                            spacing: 5,
+                            direction: Axis.horizontal,
+                            children: _mangaService.mangaList
+                                .map(
+                                  (manga) => WidgetMangaDisplay(
+                                    manga: manga,
+                                    mangaService: _mangaService,
+                                    screenSize: _screenSize,
+                                  ),
+                                )
+                                .toList(),
                           ),
-                        )
-                        .toList(),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
           ),
         ),
       ),
@@ -78,10 +115,10 @@ class _PageMangaListState extends State<PageMangaList> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // WidgetCustomFloatingActionButton(
-                //   buttonFunction: () => filterButtonClicked(context),
-                //   buttonIcon: Icons.filter_list_rounded,
-                // ),
+                WidgetCustomFloatingActionButton(
+                  buttonFunction: () => filterButtonClicked(context),
+                  buttonIcon: Icons.filter_list_rounded,
+                ),
                 SizedBox(height: 5),
                 WidgetCustomFloatingActionButton(
                   buttonFunction: () => searchButtonClicked(context),
@@ -96,6 +133,14 @@ class _PageMangaListState extends State<PageMangaList> {
                 WidgetCustomFloatingActionButton(
                   buttonFunction: () => nextPageClicked(),
                   buttonIcon: Icons.navigate_next_rounded,
+                ),
+                SizedBox(height: 5),
+                WidgetCustomFloatingActionButton(
+                  buttonFunction: () {
+                    _pageNumber = 1;
+                    _mangaService.getMangaList(_pageNumber);
+                  },
+                  buttonIcon: Icons.replay_rounded,
                 ),
               ],
             ),
@@ -202,108 +247,108 @@ class _PageMangaListState extends State<PageMangaList> {
     _mangaService.getMangaList(_pageNumber);
   }
 
-  // filterButtonClicked(BuildContext context) {
-  //   showDialog(
-  //     barrierDismissible: false,
-  //     context: context,
-  //     builder: (_) {
-  //       return Dialog(
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadiusGeometry.circular(10),
-  //         ),
-  //         child: Container(
-  //           padding: EdgeInsets.all(5),
-  //           width: _screenSize.width * 0.8,
-  //           height: _screenSize.height * 0.5,
-  //           child: Column(
-  //             crossAxisAlignment: CrossAxisAlignment.center,
-  //             children: [
-  //               Text(
-  //                 "Search genre",
-  //                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-  //               ),
-  //               SizedBox(height: 5),
-  //               WidgetCustomTextField(
-  //                 textController: _genreSearchController,
-  //                 textChangedEvent: (_) => _mangaService.getSearchedGenre(
-  //                   _genreSearchController.text,
-  //                 ),
-  //               ),
-  //               SizedBox(height: 5),
-  //               Flexible(
-  //                 child: ListenableBuilder(
-  //                   listenable: _mangaService,
-  //                   builder: (_, _) => SingleChildScrollView(
-  //                     child: Column(
-  //                       mainAxisSize: MainAxisSize.max,
-  //                       children: _mangaService.searchedGenre
-  //                           .map(
-  //                             (genre) => GestureDetector(
-  //                               onTap: () {
-  //                                 _genreSearchController.text = genre;
-  //                                 genreSelected(context);
-  //                               },
-  //                               child: Row(
-  //                                 children: [
-  //                                   Expanded(
-  //                                     child: Card(
-  //                                       child: Container(
-  //                                         padding: EdgeInsets.all(5),
-  //                                         child: Text(genre),
-  //                                       ),
-  //                                     ),
-  //                                   ),
-  //                                 ],
-  //                               ),
-  //                             ),
-  //                           )
-  //                           .toList(),
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //               SizedBox(height: 5),
-  //               Row(
-  //                 mainAxisSize: MainAxisSize.max,
-  //                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //                 children: [
-  //                   SizedBox(
-  //                     width: 80,
-  //                     child: WidgetCustomButton(
-  //                       isCloseButton: false,
-  //                       buttonText: "",
-  //                       buttonFunction: () => genreSelected(context),
-  //                     ),
-  //                   ),
-  //                   SizedBox(
-  //                     width: 80,
-  //                     child: WidgetCustomButton(
-  //                       isCloseButton: true,
-  //                       buttonText: "",
-  //                       buttonFunction: () => Navigator.pop(context),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
+  filterButtonClicked(BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (_) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(10),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(5),
+            width: _screenSize.width * 0.8,
+            height: _screenSize.height * 0.5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Search genre",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 5),
+                WidgetCustomTextField(
+                  textController: _genreSearchController,
+                  textChangedEvent: (_) => _mangaService.getSearchedGenre(
+                    _genreSearchController.text,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Expanded(
+                  child: ListenableBuilder(
+                    listenable: _mangaService,
+                    builder: (_, _) => SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: _mangaService.searchedGenre
+                            .map(
+                              (genre) => GestureDetector(
+                                onTap: () {
+                                  _genreSearchController.text = genre;
+                                  genreSelected(context);
+                                },
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Card(
+                                        child: Container(
+                                          padding: EdgeInsets.all(5),
+                                          child: Text(genre),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 5),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SizedBox(
+                      width: 80,
+                      child: WidgetCustomButton(
+                        isCloseButton: false,
+                        buttonText: "",
+                        buttonFunction: () => genreSelected(context),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 80,
+                      child: WidgetCustomButton(
+                        isCloseButton: true,
+                        buttonText: "",
+                        buttonFunction: () => Navigator.pop(context),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
-  // genreSelected(BuildContext context) {
-  //   print(_genreSearchController.text);
-  //   Navigator.pop(context);
-  //   if (_genreSearchController.text.isEmpty) {
-  //     _pageNumber = 1;
-  //     _mangaService.getMangaList(_pageNumber);
-  //     return;
-  //   }
+  genreSelected(BuildContext context) {
+    debugPrint(_genreSearchController.text);
+    Navigator.pop(context);
+    if (_genreSearchController.text.isEmpty) {
+      _pageNumber = 1;
+      _mangaService.getMangaList(_pageNumber);
+      return;
+    }
 
-  //   _mangaService.getMangaListByGenre(_genreSearchController.text, _pageNumber);
-  //   _genreSearchController.text = "";
-  //   _mangaService.resetGenreList();
-  // }
+    _mangaService.getMangaListByGenre(_genreSearchController.text, _pageNumber);
+    _genreSearchController.text = "";
+    _mangaService.resetGenreList();
+  }
 }
